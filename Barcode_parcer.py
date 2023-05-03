@@ -24,7 +24,7 @@ def cropimage(elem, browser, name):
     xshift += 125
     fullImg = Image.open("pagescreenshot.png") 
     cropImg = fullImg.crop((x, y, width, height)) 
-    cropImg.save(str(name) + '.png')    # Херь какая-то получается со скринами
+    cropImg.save(str(name) + '.png')
 
 def parcer(barcode):
     translate_symbols = {'™':None, '®':None}
@@ -52,11 +52,11 @@ def parcer(barcode):
 
 
 def ozon_parcer(name):
-
+  
     option = Options()
     option.add_argument("--start-maximized")
     option.add_argument("--disable-infobars") 
-    option.add_experimental_option('excludeSwitches', ['enable-logging'])
+    option.add_experimental_option('excludeSwitches', ['enable-logging'])   # Функция для обхода cloudfare
     browser = webdriver.Chrome('E:\Programs\Python\ChromeDriver\chromedriver.exe', options=option)
 
     browser.get('https://www.ozon.ru')
@@ -71,13 +71,11 @@ def ozon_parcer(name):
     elements_arr.append(browser.find_element(By.XPATH, '//*[@id="paginatorContent"]/div/div/div[2]'))
     elements_arr.append(browser.find_element(By.XPATH, '//*[@id="paginatorContent"]/div/div/div[3]'))
 
-    count = 0
-
-    for elem in elements_arr:
-        cropimage(elem, browser, 'image' + str(count))
-        count+=1
+    href = [elements.get_attribute('href') for elements in elements_arr]    # Переменная для хранения ссылок на товары
 
     time.sleep(3)
+
+    return href
 
 
 barcode = '8594737253317'
