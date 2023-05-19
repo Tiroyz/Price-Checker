@@ -9,7 +9,7 @@ import time
 from bs4 import BeautifulSoup
 from PIL import Image
 
-xshift = 140
+xshift = 145
 
 def cropimage(elem, browser, name):
     global xshift
@@ -67,7 +67,7 @@ def ozon_parcer(name):
 
     browser.execute_script("window.scrollTo(0, 150)")
 
-    elements_arr = [browser.find_element(By.XPATH, '//*[@id="paginatorContent"]/div/div/div[1]')]
+    elements_arr = [browser.find_element(By.XPATH, '//*[@id="paginatorContent"]/div/div/div[1]')]   # Первые три товара на странице
     elements_arr.append(browser.find_element(By.XPATH, '//*[@id="paginatorContent"]/div/div/div[2]'))
     elements_arr.append(browser.find_element(By.XPATH, '//*[@id="paginatorContent"]/div/div/div[3]'))
 
@@ -84,10 +84,38 @@ def ozon_parcer(name):
     return href
 
 
+def yamarket_parcer(name):
+    
+    option = Options()
+    option.add_argument("--start-maximized")
+    option.add_argument("--disable-infobars") 
+    option.add_experimental_option('excludeSwitches', ['enable-logging'])   # Функция для обхода cloudfare
+    browser = webdriver.Chrome('E:\Programs\Python\ChromeDriver\chromedriver.exe', options=option)
+
+    browser.get('https://market.yandex.ru')
+    elem = browser.find_element(By.NAME, 'text')
+    elem.send_keys(str(name) + Keys.RETURN)
+
+    time.sleep(3)
+
+    elements_arr = [browser.find_element(By.XPATH, '//*[@id="page-kxm33fslwfr"]/div/div/div/div/div/div[1]/div/div/div/div/div')]   # Первые три товара на странице
+    elements_arr.append(browser.find_element(By.XPATH, '//*[@id="page-kxm33fslwfr"]/div/div/div/div/div/div[2]/div/div/div/div/div'))
+    elements_arr.append(browser.find_element(By.XPATH, '//*[@id="page-kxm33fslwfr"]/div/div/div/div/div/div[3]/div/div/div/div/div'))
+
+    href = [elements.get_attribute('href') for elements in elements_arr]    # Переменная для хранения ссылок на товары
+    
+    count = 0
+    
+    for elem in elements_arr:
+        cropimage(elem, browser, 'image' + str(count))
+        browser.execute_script("window.scrollTo(0, 150)")
+        count+=1
+
+
 barcode = '8594737253317'
 
 name = 'НОВО-ПАССИТ, ТАБЛЕТКИ ПОКРЫТЫЕ'
 
 print(name)
 
-ozon_parcer(name)
+yamarket_parcer(name)
