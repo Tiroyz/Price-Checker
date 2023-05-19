@@ -73,6 +73,12 @@ def ozon_parcer(name):
 
     href = [elements.get_attribute('href') for elements in elements_arr]    # Переменная для хранения ссылок на товары
 
+    count = 0
+    
+    for elem in elements_arr:
+        cropimage(elem, browser, 'image' + str(count))
+        count+=1
+
     time.sleep(3)
 
     return href
