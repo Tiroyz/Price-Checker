@@ -11,7 +11,7 @@ from PIL import Image
 
 xshift = 145
 
-def cropimage(elem, browser, name):
+def cropimage_ozon(elem, browser, name):
     global xshift
     location = elem.location
     size = elem.size
@@ -25,6 +25,21 @@ def cropimage(elem, browser, name):
     fullImg = Image.open("pagescreenshot.png") 
     cropImg = fullImg.crop((x, y, width, height)) 
     cropImg.save(str(name) + '.png')
+
+
+def cropimage_yandex(elem, browser, name):  # TODO доделать правильную обрезку элемента
+    location = elem.location
+    size = elem.size
+    browser.save_screenshot('pagescreenshot.png')
+    
+    x = location['x']
+    y = location['y']
+    width = x + size['width'] + 300
+    height = y + size['height']
+    fullImg = Image.open("pagescreenshot.png") 
+    cropImg = fullImg.crop((x, y, width, height)) 
+    cropImg.save(str(name) + '.png')
+
 
 def parcer(barcode):
     translate_symbols = {'™':None, '®':None}
@@ -76,7 +91,7 @@ def ozon_parcer(name):
     count = 0
     
     for elem in elements_arr:
-        cropimage(elem, browser, 'image' + str(count))
+        cropimage_ozon(elem, browser, 'image' + str(count))
         count+=1
 
     time.sleep(3)
@@ -96,19 +111,21 @@ def yamarket_parcer(name):
     elem = browser.find_element(By.NAME, 'text')
     elem.send_keys(str(name) + Keys.RETURN)
 
-    time.sleep(3)
+    time.sleep(3) 
 
-    elements_arr = [browser.find_element(By.XPATH, '//*[@id="page-kxm33fslwfr"]/div/div/div/div/div/div[1]/div/div/div/div/div')]   # Первые три товара на странице
-    elements_arr.append(browser.find_element(By.XPATH, '//*[@id="page-kxm33fslwfr"]/div/div/div/div/div/div[2]/div/div/div/div/div'))
-    elements_arr.append(browser.find_element(By.XPATH, '//*[@id="page-kxm33fslwfr"]/div/div/div/div/div/div[3]/div/div/div/div/div'))
+    elements_arr = [browser.find_element(By.XPATH, '/html/body/div[2]/div[2]/div[1]/div[5]/div/div/div/div/div/div/div[5]/div/div/div/div/main/div/div/div/div/div/div/div[1]')]   # Первые три товара на странице
+    elements_arr.append(browser.find_element(By.XPATH, '/html/body/div[2]/div[2]/div[1]/div[5]/div/div/div/div/div/div/div[5]/div/div/div/div/main/div/div/div/div/div/div/div[2]'))
+    elements_arr.append(browser.find_element(By.XPATH, '/html/body/div[2]/div[2]/div[1]/div[5]/div/div/div/div/div/div/div[5]/div/div/div/div/main/div/div/div/div/div/div/div[3]'))
 
     href = [elements.get_attribute('href') for elements in elements_arr]    # Переменная для хранения ссылок на товары
     
+    browser.execute_script("window.scrollTo(0, 150)") # TODO прокрутка до элемента, а не на количество пикселей
+
     count = 0
     
     for elem in elements_arr:
-        cropimage(elem, browser, 'image' + str(count))
-        browser.execute_script("window.scrollTo(0, 150)")
+        cropimage_yandex(elem, browser, 'image' + str(count))
+        browser.execute_script("window.scrollTo(0, 100)")   # TODO прокрутка до элемента, а не на количество пикселей
         count+=1
 
 
