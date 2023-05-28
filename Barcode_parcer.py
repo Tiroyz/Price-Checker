@@ -99,7 +99,7 @@ def ozon_parcer(name):
     return href
 
 
-def yamarket_parcer(name):
+def yamarket_parcer(name): # Плохо парсится из-за капчи
     
     option = Options()
     option.add_argument("--start-maximized")
@@ -129,10 +129,40 @@ def yamarket_parcer(name):
         count+=1
 
 
+def wb_parcer(name):
+    option = Options()
+    option.add_argument("--start-maximized")
+    option.add_argument("--disable-infobars") 
+    option.add_experimental_option('excludeSwitches', ['enable-logging'])   # Функция для обхода cloudfare
+    browser = webdriver.Chrome('E:\Programs\Python\ChromeDriver\chromedriver.exe', options=option)
+
+    browser.get('https://www.wildberries.ru/')
+    elem = browser.find_element(By.ID, 'searchInput')
+    elem.send_keys(str(name) + Keys.RETURN)
+
+    time.sleep(3) 
+
+
+    elements_arr = [browser.find_element(By.CLASS_NAME, '')]   # TODO Не ищет элементы на странице
+    elements_arr.append(browser.find_elements(By.CLASS_NAME, ''))
+
+    href = [elements.get_attribute('href') for elements in elements_arr]    # Переменная для хранения ссылок на товары
+    
+    browser.execute_script("arguments[0].scrollIntoView(scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'end' });", elements_arr[0]) # TODO прокрутка до элемента, а не на количество пикселей
+
+    count = 0
+    
+    for elem in elements_arr:
+        cropimage_yandex(elem, browser, 'image' + str(count))
+        browser.execute_script("arguments[0].scrollIntoView(scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'end' });", elem)   # TODO прокрутка до элемента, а не на количество пикселей
+        count+=1
+
+
+
 barcode = '8594737253317'
 
 name = 'НОВО-ПАССИТ, ТАБЛЕТКИ ПОКРЫТЫЕ'
 
 print(name)
 
-yamarket_parcer(name)
+wb_parcer(name)
